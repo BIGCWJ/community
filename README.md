@@ -1,3 +1,7 @@
 # community
-Majiangcommunity
-1：第一次版本提交
+##Majiangcommunity
+
+##资料
+
+[Spring 文档]http://spring.io/guides
+
