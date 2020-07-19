@@ -1,12 +1,3 @@
-# community
-##Majiangcommunity
-
-##资料
-
-[Spring 文档]http://spring.io/guides
-
-##脚本
-```
 CREATE TABLE USER(
     ID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     ACCOUNT_ID VARCHAR(100),
@@ -15,6 +6,3 @@ CREATE TABLE USER(
     GMT_CREATE BIGINT,
     GMT_MODIFIED BIGINT
 )
-```
-
-
