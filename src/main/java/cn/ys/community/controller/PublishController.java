@@ -1,17 +1,19 @@
 package cn.ys.community.controller;
 
+import cn.ys.community.dto.QuestionDTO;
 import cn.ys.community.mapper.QuestionMapper;
 import cn.ys.community.mapper.UserMapper;
 import cn.ys.community.model.Question;
 import cn.ys.community.model.User;
+import cn.ys.community.service.QuestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -21,10 +23,17 @@ import javax.servlet.http.HttpServletRequest;
 public class PublishController {
 
     @Autowired
-    private QuestionMapper questionMapper;
+    private QuestService questService;
 
-    @Autowired
-    private UserMapper userMapper;
+    @GetMapping("/publish/{id}")
+    public String edit(@PathVariable(name = "id") Integer id,Model model){
+        QuestionDTO question = questService.getById(id);
+        model.addAttribute("title",question.getTitle());
+        model.addAttribute("description",question.getDescription());
+        model.addAttribute("tag",question.getTag());
+        return "publish";
+    }
+
 
     //url中输入/publish时返回页面
     @GetMapping("/publish")
@@ -35,9 +44,10 @@ public class PublishController {
     //提交/publish时调用以下方法，并返回主页
     @PostMapping("/publish")
     public String doPublish(
-            @RequestParam("title") String title,
-            @RequestParam("description") String description,
-            @RequestParam("tag") String tag,
+            @RequestParam(value = "title" ,required = false) String title,
+            @RequestParam(value = "description" , required = false) String description,
+            @RequestParam(value = "tag" ,required = false) String tag,
+            @RequestParam(value = "id" , required = false) Integer id,
             HttpServletRequest request,
             Model model
     ) {
@@ -59,28 +69,7 @@ public class PublishController {
             return "publish";
         }
 
-
-        User user = null;
-        //获取当前浏览器的所有cookies
-        Cookie[] cookies = request.getCookies();
-        //判断是否为null，若不判断有可能空指针异常
-        if (cookies != null) {
-            //遍历cookies，查找是否有叫token的Cookie
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("token")) {
-                    //找到该cookie，取出对应值
-                    String token = cookie.getValue();
-                    //调用findByToken获取user值
-                    user = userMapper.findByToken(token);
-                    if (user != null) {
-                        //user存在，则将user设置到session中
-                        request.getSession().setAttribute("user", user);
-                    }
-                    //有找到，则跳出循环
-                    break;
-                }
-            }
-        }
+        User user = (User) request.getSession().getAttribute("user");
 
         //判断是否登录，未登录则直接返回，刷新页面
         if (user == null) {
@@ -94,9 +83,8 @@ public class PublishController {
         question.setTag(tag);
         question.setDescription(description);
         question.setCreator(user.getId());
-        question.setGmtCreate(System.currentTimeMillis());
-        question.setGmtModified(question.getGmtCreate());
-        questionMapper.create(question);
+        question.setId(id);
+        questService.createOrUpdate(question);
 
         //执行成功返回主页
         return "redirect:/";
