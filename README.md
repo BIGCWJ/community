@@ -17,5 +17,11 @@ CREATE TABLE USER(
     GMT_MODIFIED BIGINT
 )
 ```
+命令
+
+mvn flyway:migrate
+
+mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
+
 
 

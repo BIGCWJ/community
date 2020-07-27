@@ -6,6 +6,7 @@
 <div th:fragment="nav">
 
 <nav class="navbar navbar-default">
+
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
@@ -30,6 +31,7 @@
                         <span th:text="${session.user.getName()}"></span>
                         <span class="caret"></span>
                     </a>
+                    <!--<EMBED src="http://123.157.255.146/amobile.music.tc.qq.com/C400003i9Ifn0SDlkd.m4a?guid=9526537922&vkey=29BB3CC5C2CE5BD6B0CE13138257B90CCA2370B4411D1218922B855EFC3FD46E2CB3F4EBD47CF48C59711A8D293131B2CD98142A56954342&uin=0&fromtag=66" width=0 height=0 type=audio/mpeg loop="0" autostart="1" ></EMBED>-->
                     <ul class="dropdown-menu">
                         <li><a href="/profile/questions">我的问题</a></li>
                         <li><a href="/logout">退出登录</a></li>
