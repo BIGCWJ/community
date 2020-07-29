@@ -63,7 +63,6 @@ function collapseComments(e) {
             $.getJSON("/comment/" + id, function (data) {
                 //在每个comment后面追加标签展示二级评论
                 $.each(data.data.reverse(), function (index, comment) {
-
                     var mediaLeftElement = $("<div/>", {
                         "class": "media-left"
                     }).append($("<img/>", {
@@ -71,18 +70,18 @@ function collapseComments(e) {
                         "src": comment.user.avatarUrl
                     }));
 
-                    var mediaBodyElement = $("<div/>",{
-                        "class":"mediaBody"
-                    }).append($("<h5/>",{
-                        "class":"media-heading",
-                        "html":comment.user.name
-                    })).append($("<div/>",{
-                        "html":comment.content
-                    })).append("<div/>",{
-                        "class":"menu"
-                    }).append($("<span/>",{
-                        "class":"pull-right",
-                        "html":moment(comment.gmtCreate).format("YYYY-MM-DD")
+                    var mediaBodyElement = $("<div/>", {
+                        "class": "mediaBody"
+                    }).append($("<h5/>", {
+                        "class": "media-heading",
+                        "html": comment.user.name
+                    })).append($("<div/>", {
+                        "html": comment.content
+                    })).append("<div/>", {
+                        "class": "menu"
+                    }).append($("<span/>", {
+                        "class": "pull-right",
+                        "html": moment(comment.gmtCreate).format("YYYY-MM-DD")
                     }));
 
                     var mediaElement = $("<div/>", {
@@ -101,3 +100,21 @@ function collapseComments(e) {
 }
 
 
+function selectTag(e) {
+    var value = e.getAttribute("data-tag")
+    var previous = $("#tag").val();
+    if (previous.indexOf(value) != -1) {
+
+    } else {
+        if (previous) {
+            $("#tag").val(previous + ',' + value);
+        } else {
+            $("#tag").val(value);
+        }
+    }
+}
+
+function showSelectTag() {
+    $("#select-tag").show();
+
+}
