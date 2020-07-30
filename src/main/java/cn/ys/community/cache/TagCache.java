@@ -16,7 +16,7 @@ public class TagCache {
         List<TagDTO> tagDTOS = new ArrayList<>();
         TagDTO program = new TagDTO();
         program.setCategoryName("开发语言");
-        program.setTags(Arrays.asList("js","php","python","node","html","css","C","C++"));
+        program.setTags(Arrays.asList("js","php","python","node","html","css","C","C++","Java"));
         tagDTOS.add(program);
 
         TagDTO framework = new TagDTO();

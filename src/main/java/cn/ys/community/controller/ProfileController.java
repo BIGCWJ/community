@@ -2,6 +2,7 @@ package cn.ys.community.controller;
 
 import cn.ys.community.dto.PaginationDTO;
 import cn.ys.community.model.User;
+import cn.ys.community.service.NotificationService;
 import cn.ys.community.service.QuestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,9 @@ public class ProfileController {
 
     @Autowired
     private QuestService questService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/profile/{action}")
     public String profile(@PathVariable(name = "action") String action,
@@ -34,14 +38,18 @@ public class ProfileController {
         if ("questions".equals(action)) {
             model.addAttribute("section", "questions");
             model.addAttribute("sectionName", "我的提问");
+            PaginationDTO pagination = questService.list(user.getId(),page,size);
+            //将该数据绑定前端
+            model.addAttribute("pagination", pagination);
         } else if ("replies".equals(action)) {
+            PaginationDTO pagination = notificationService.list(user.getId(),page,size);
             model.addAttribute("section", "replies");
             model.addAttribute("sectionName", "最新回复");
+            //将该数据绑定前端
+            model.addAttribute("pagination", pagination);
         }
 
-        PaginationDTO pagination = questService.list(user.getId(),page,size);
-        //将该数据绑定前端
-        model.addAttribute("pagination", pagination);
+
         return "profile";
     }
 

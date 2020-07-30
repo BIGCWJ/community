@@ -2,6 +2,8 @@ package cn.ys.community.service;
 
 import cn.ys.community.dto.CommentDTO;
 import cn.ys.community.enums.CommentTpyeEnum;
+import cn.ys.community.enums.NotificationStatusEnum;
+import cn.ys.community.enums.NotificationTypeEnum;
 import cn.ys.community.exception.CustomizeErrorCode;
 import cn.ys.community.exception.CustomizeException;
 import cn.ys.community.mapper.*;
@@ -35,25 +37,45 @@ public class CommentService {
     @Autowired
     private CommentExtMapper commentExtMapper;
 
+    @Autowired
+    private NotificationMapper notificationMapper;
+
+    //插入评论
+    //该注解解释如果未全部执行成功，回滚
     @Transactional
-    public void insert(Comment comment) {
+    public void insert(Comment comment, User commentator) {
+        //评论的问题不能为空
         if (comment.getParentId() == null || comment.getParentId() == 0) {
             throw new CustomizeException(CustomizeErrorCode.TARGET_PARAM_NOT_FOUND);
         }
+        //评论的类型不能为空或者不能存在其他类型的评论
         if (comment.getType() == null || !CommentTpyeEnum.isExist(comment.getType())) {
             throw new CustomizeException(CustomizeErrorCode.TYPE_PARAM_WRONG);
         }
-        //回复大问题的评论
+        //回复评论
         if (comment.getType() == CommentTpyeEnum.COMMENT.getType()) {
-
+            //查找该评论的上一级的评论对象
             Comment dbComment = commentMapper.selectByPrimaryKey(comment.getParentId());
+            //如果为空，则抛出评论谁啊未找到的异常
             if (dbComment == null) {
                 throw new CustomizeException(CustomizeErrorCode.COMMENT_MOT_FOUND);
             }
+
+            //回复问题
+            Question question = questionMapper.selectByPrimaryKey(dbComment.getParentId());
+            if (question == null) {
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
+
+            //插入该评论
             commentMapper.insert(comment);
-            //增加评论数
+            //增加上一级评论的评论数
             dbComment.setCommentCount(1);
+            //执行
             commentExtMapper.incCommentCount(dbComment);
+
+            //创建通知
+            createNotify(comment, dbComment.getCommentator(), commentator.getName(), question.getTitle(), NotificationTypeEnum.REPLY_COMMMENT, question.getId());
 
         } else {
             //回复问题
@@ -66,7 +88,31 @@ public class CommentService {
             commentMapper.insert(comment);
             question.setCommentCount(1L);
             questionExtMapper.incCommentCount(question);
+
+            //创建通知
+            createNotify(comment, question.getCreator(),commentator.getName() ,question.getTitle() ,NotificationTypeEnum.REPLY_QUESTION, question.getId());
         }
+    }
+
+    private void createNotify(Comment comment, Long receiver, String notifierName, String outerTitle, NotificationTypeEnum notificationType, Long outid) {
+        Notification notification = new Notification();
+        notification.setGmtCreate(System.currentTimeMillis());
+        //该类型为回复评论类型
+        notification.setType(notificationType.getType());
+        //设置question的id作为outid
+        notification.setOutid(outid);
+        //设置评论者的id（关联userid）作为（谁谁谁）回复了 ***
+        notification.setNotifier(comment.getCommentator());
+        //设置未读状态
+        notification.setStatus(NotificationStatusEnum.UNREAD.getStatus());
+        //设置回复对象
+        notification.setReceiver(receiver);
+        //设置通知者名字
+        notification.setNotifierName(notifierName);
+        //设置标题
+        notification.setOuterTitle(outerTitle);
+        //执行
+        notificationMapper.insert(notification);
     }
 
     public List<CommentDTO> listByTargetId(Long id, CommentTpyeEnum type) {

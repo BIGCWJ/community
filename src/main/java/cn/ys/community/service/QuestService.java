@@ -73,7 +73,7 @@ public class QuestService {
             questionDTOList.add(questionDTO);
         }
         //结合分页
-        paginationDTO.setQuestions(questionDTOList);
+        paginationDTO.setData(questionDTOList);
         //返回paginationDTO
         return paginationDTO;
     }
@@ -81,7 +81,7 @@ public class QuestService {
     public PaginationDTO list(Long userId, Integer page, Integer size) {
 
         PaginationDTO paginationDTO = new PaginationDTO();
-        //获取question总数totalCount
+        //获取该用户下question总数totalCount
         QuestionExample questionExample = new QuestionExample();
         questionExample.createCriteria().andCreatorEqualTo(userId);
         Integer totalCount = (int) questionMapper.countByExample(questionExample);
@@ -117,7 +117,7 @@ public class QuestService {
             questionDTOList.add(questionDTO);
         }
         //结合分页
-        paginationDTO.setQuestions(questionDTOList);
+        paginationDTO.setData(questionDTOList);
         //返回paginationDTO
         return paginationDTO;
     }

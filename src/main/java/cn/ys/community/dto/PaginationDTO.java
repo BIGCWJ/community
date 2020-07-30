@@ -15,8 +15,8 @@ import java.util.List;
  * pages里包含最后一页的页面时候，>>隐藏
  */
 @Data
-public class PaginationDTO {
-    private List<QuestionDTO> questions;
+public class PaginationDTO<T> {
+    private List<T> data;
     private boolean showPrevious;
     private boolean showFirstPage;
     private boolean showNext;
